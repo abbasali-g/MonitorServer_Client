@@ -5,8 +5,12 @@ apt install -y python3-pip
 pip3 install --upgrade setuptools
 sudo apt install gcc gcc-8 g++-8
 apt install -y unixodbc-dev
-pip3 install  pyodbc
+sudo apt install libodbc1
+#sudo apt install python3-pyodbc
+#pip3 install  pyodbc
 #pip3 install --user pyodbc
+pip3 install pymssql
+pip3 install pymysql
 pip3 install psutil
 pip3 install urllib3
 pip3 install py-dmidecode

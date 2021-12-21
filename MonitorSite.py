@@ -2,7 +2,9 @@
 import sys
 import json
 import os
-import pyodbc
+#import pyodbc
+import pymssql
+import pymysql
 import urllib3
 import DateConvertor as dt
 import datetime
@@ -18,7 +20,7 @@ import platform
 logPath = None
 errorLogPath = None
 databasedriver = None
-workingDirectory = "/home/legal/dtec/Monitor/"
+workingDirectory = "/d/DtecMonitor/Monitoring_ClientSide_Git/Monitoring_ClientSide/"
 saveToFile = None
 project_isonline = None
 offline_history = None
@@ -31,11 +33,11 @@ sqltype = None
 
 def writeErrorToFile(msg):
     # try:
-    # file = open("/home/abbas/Desktop/"+str(datetime.datetime.now().date())+".txt", "a+")
+    # file = open("/home/abbas/Desktop/"+str(datetime.datetime.now().dsudo apt install libodbc1ate())+".txt", "a+")
     file = open(errorLogPath + "Error_" + str(datetime.datetime.now().date()) + ".txt", "a+")
     file.write(str(datetime.datetime.now()) + ":" + str(msg) + "\r\n")
     file.close()
-    # except Exception as exx:
+    # except Exception as exx:>
     #   print(exx)
 
 def writeLogToFile(msg):
@@ -86,8 +88,11 @@ def saveData(siteContent):
                 f.write("<html><body>" + siteContent + "</body></html>")
                 f.close()
             if (saveToFile == "0"):  # write to database
-                conn = pyodbc.connect(databasedriver)
-                cursor = conn.cursor()
+                if (sqltype == "Mssql"):
+                    conn = pymssql.connect(databasedriver)
+                if (sqltype == "Mysql"):
+                    conn = pymysql.connect(databasedriver)
+                cursor = conn.cursor(as_dict=True)
                 # delete the Old History
                 cursor.execute("delete from sitescan ")
                 cursor.execute(
@@ -118,7 +123,11 @@ def saveData(siteContent):
                         writeErrorToFile(ex)
 
             if (saveToFile == "0"):  # write to database
-                conn = pyodbc.connect(databasedriver)
+                if (sqltype == "Mssql"):
+                    conn = pymssql.connect(databasedriver)
+                if (sqltype == "Mysql"):
+                    conn = pymysql.connect(databasedriver)
+
                 cursor = conn.cursor()
                 cursor.execute(
                     "insert into sitescan(sitecontent,regDateTime) values('" + siteContent.replace("b'", "").replace(
@@ -127,7 +136,7 @@ def saveData(siteContent):
                 cursor.execute("delete from sitescan where regDateTime<='" + str(
                     datetime.datetime.now() - datetime.timedelta(days=int(offline_history))) + "'")
                 # cursor.execute("delete from sitescan where regDateTime<='" + str(datetime.datetime.now() - datetime.timedelta(seconds=50)) + "'")
-                conn.commit()
+                conn.commit
                 conn.close()
         except Exception as fileex:
             writeErrorToFile(fileex)
@@ -171,17 +180,20 @@ def monitorSite(project_dict):
     errorLogPath = project_dict['logPath']
     saveToFile = project_dict['saveToFile']
     readFromFile = project_dict['readFromFile']
-    mysql_odbcdrivername = project_dict['mysql_odbcdrivername']
-    mssql_odbcdrivername = project_dict['mssql_odbcdrivername']
+    
 
-    databasedriver = "DRIVER={" + mssql_odbcdrivername + "};SERVER=" + de_asymetricAbbas2(
-        sql_server) + ";DATABASE=" + de_asymetricAbbas2(sql_database_name) + ";UID=" + de_asymetricAbbas2(
-        sql_username) + ";PWD=" + de_asymetricAbbas2(sql_password)
+    # databasedriver = "DRIVER={" + mssql_odbcdrivername + "};SERVER=" + de_asymetricAbbas2(
+    #     sql_server) + ";DATABASE=" + de_asymetricAbbas2(sql_database_name) + ";UID=" + de_asymetricAbbas2(
+    #     sql_username) + ";PWD=" + de_asymetricAbbas2(sql_password)
+    databasedriver = "host="+de_asymetricAbbas2(sql_server) + ",user="+de_asymetricAbbas2(sql_username) + ",password=" + de_asymetricAbbas2(sql_password)+",database=" + de_asymetricAbbas2(sql_database_name) ;
     if (sqltype == "Mysql"):
-        databasedriver = "DRIVER={" + mysql_odbcdrivername + "};SERVER=" + de_asymetricAbbas2(
-            sql_server) + ";DATABASE=" + de_asymetricAbbas2(sql_database_name) + ";UID=" + de_asymetricAbbas2(
-            sql_username) + ";PWD=" + de_asymetricAbbas2(sql_password)
+        # databasedriver = "DRIVER={" + mysql_odbcdrivername + "};SERVER=" + de_asymetricAbbas2(
+        #     sql_server) + ";DATABASE=" + de_asymetricAbbas2(sql_database_name) + ";UID=" + de_asymetricAbbas2(
+        #     sql_username) + ";PWD=" + de_asymetricAbbas2(sql_password)
+        databasedriver = de_asymetricAbbas2(sql_server) + ","+de_asymetricAbbas2(sql_username) + "," + de_asymetricAbbas2(sql_password)+"," + de_asymetricAbbas2(sql_database_name) ;
 
+    
+   
 
     # end of vaiables
 
@@ -190,10 +202,15 @@ def monitorSite(project_dict):
         try:
             sitecontent = ""
             query = "select top 1 sitecontent from sitescan order by regdatetime desc"  # for sqlserver
-            conn = pyodbc.connect(databasedriver)
-            cursor = conn.cursor()
+            
             if (sqltype == "Mysql"):
                 query = "select sitecontent from sitescan order by regdatetime desc limit 1"  # for mysql
+            
+            if (sqltype == "Mssql"):
+                conn = pymssql.connect(databasedriver)
+            if (sqltype == "Mysql"):
+                conn = pymysql.connect(databasedriver)
+            cursor = conn.cursor(as_dict=True)
             cursor.execute(query)
             row = cursor.fetchone()
             sitecontent = str(row[0])
@@ -214,8 +231,13 @@ def monitorSite(project_dict):
     try:  # connect to database
         json_response += "'projectname':'" + projectname + "'"
         if (sqltype != "false"):
-            conn = pyodbc.connect(databasedriver)
-            cursor = conn.cursor()
+            if (sqltype == "Mssql"):
+                conn = pymssql.connect(databasedriver)
+            if (sqltype == "Mysql"):
+                conn = pymysql.connect(databasedriver)
+            
+            
+            cursor = conn.cursor(as_dict=True)
             conn.close()
             json_response += ",'dbcon':1"
         else:
@@ -374,6 +396,7 @@ def doPing(hostname):
 
 
 # monitorSite()
+print("Python Running")
 
 if (len(sys.argv) > 1):
     if (str(sys.argv[1]) == "enc"):
@@ -386,12 +409,13 @@ if (len(sys.argv) > 1):
         doPing(sys.argv[2])
 else:
     try:
-        # print(os.getcwd())
+        print(os.getcwd())
         json_file = open(workingDirectory+'project.config')
         data = json.load(json_file)
 
         for project in data['project_Config']:
             monitorSite(project)
+            
     except Exception as jsonex:
         #print("::: "+str(jsonex))
         writeErrorToFile("Json File Exception:" + str(jsonex))

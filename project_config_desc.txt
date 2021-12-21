@@ -1,33 +1,61 @@
 {
   "project_Config":
-    {
-      "projectname": "Dade Tamin",
-      "project_isonline": "0", {0=false,1=true} project not have access to internet
-      "SQL_server" : "remotemysql.com",
-      "SQL_username" : "u3cu6bor98",
-      "SQL_password" : "aC2joLi1hW",
-      "SQL_database_name" : "u3cu6bor98",
-      "SQL_port" : "3306",
-      "SqlType" : "Mysql",{Mysql,Mssql,false=not to check for db}
-      "OsType" : "Linux",{Linux,windows}
-      "DiskPath" : "['/','/']",{"c:","d:"} for windows
-      "DbBackupPath" : "/home/gh/Downloads/DatataminSite/pub/wwwroot/Files/*.bak",{false=not to check,path}
-      "logPath" : "/home/gh/Downloads/",
-      "errorLogPath" : "/home/gh/Downloads",
-      "MinimumDiskSize": "10", minimum disk size in Gig
-      "LastBackupDate": "1", days
-      "Serial1":"0000000000",
-      "Serial2":"0000000000",
-      "SitePath" : "/home/gh/Downloads/sitescan.htm",
-      "offline_sitePath" : "/home/gh/Downloads/",
-      "offline_history" : "10", days, deletes the history older than n days
-      "saveToFile":"1",{0=save to Database,1=save to file}
-      "readFromFile":"0",{0=read from Database,1= actual read from system}
-      "mysql_odbcdrivername":"MySQL ODBC 8.0 Driver",{Linux="MySQL ODBC 8.0 Driver",Windows="MySQL ODBC 8.0 ANSI Driver"}
-      "mssql_odbcdrivername":"ODBC Driver 17 for SQL Server" {Linux="ODBC Driver 17 for SQL Server",Windows="ODBC Driver 17 for SQL Server"}
-    }
+    [
+        {
+          "projectname": "Dade Tamin",
+          "project_isonline": "0",
+          "SQL_server" : "MTkyLIjE82OC64yLIjI=",
+          "SQL_username" : "zc82E=",
+          "SQL_password" : "MTIz",
+          "SQL_database_name" : "RW91kYWRfTW9zyaGFyZWthdFA==",
+          "SQL_port" : "1433",
+          "SqlType" : "Mssql",
+          "OsType" : "Linux",
+          "DiskPath" : "['/;50','/;50']",
+          "DbBackupPath" : "/home/gh/Downloads/DatataminSite/pub/wwwroot/Files/*.bak",
+          "logPath" : "/home/gh/Downloads/",
+          "errorLogPath" : "/home/gh/Downloads",
+          "MinimumDiskSize": "10",
+          "LastBackupDate": "1",
+          "Serial1":"0000000000",
+          "Serial2":"0000000000",
+          "SitePath" : "/home/gh/Downloads/sitescan.htm",
+          "offline_sitePath" : "/home/gh/Downloads/",
+          "offline_history" : "10",
+          "saveToFile":"1",
+          "readFromFile":"1",
+          "mysql_odbcdrivername":"MySQL ODBC 8.0 Driver",
+          "mssql_odbcdrivername":"ODBC Driver 17 for SQL Server"
+        },
+        {
+          "projectname": "Emdad DB",
+          "project_isonline": "1",
+          "SQL_server" : "JzE5Mi64xNjguMTFAyLIjQ91Jw==",
+          "SQL_username" : "J73NhJw==",
+          "SQL_password" : "J91yBhzc73NwYXNzISNFAJCzc=",
+          "SQL_database_name" : "J0VtZGFkX091vzc82hhzcmVrYXQn",
+          "SQL_port" : "1433",
+          "SqlType" : "false",
+          "OsType" : "Windows",
+          "DiskPath" : "['c:']",
+          "DbBackupPath" : "false",
+          "logPath" : "c:\\Monitor\\MonitorDb\\",
+          "errorLogPath" : "c:\\Monitor\\MonitorDb\\",
+          "MinimumDiskSize": "10",
+          "LastBackupDate": "1",
+          "Serial1":"0000000000",
+          "Serial2":"0000000000",
+          "SitePath" : "C:\\EmdadPublish\\wwwroot\\sitescandb.htm",
+          "offline_sitePath" : "C:\\EmdadPublish\\wwwroot\\",
+          "offline_history" : "10",
+          "saveToFile":"1",
+          "readFromFile":"0"
+          
+        }
+    ]
 
 }
+
 #table
 sitescan table
 id	int	auto increment
