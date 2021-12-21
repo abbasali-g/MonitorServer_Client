@@ -1,0 +1,35 @@
+{
+  "project_Config":
+    {
+      "projectname": "Dade Tamin",
+      "project_isonline": "0", {0=false,1=true} project not have access to internet
+      "SQL_server" : "remotemysql.com",
+      "SQL_username" : "u3cu6bor98",
+      "SQL_password" : "aC2joLi1hW",
+      "SQL_database_name" : "u3cu6bor98",
+      "SQL_port" : "3306",
+      "SqlType" : "Mysql",{Mysql,Mssql,false=not to check for db}
+      "OsType" : "Linux",{Linux,windows}
+      "DiskPath" : "['/','/']",{"c:","d:"} for windows
+      "DbBackupPath" : "/home/gh/Downloads/DatataminSite/pub/wwwroot/Files/*.bak",{false=not to check,path}
+      "logPath" : "/home/gh/Downloads/",
+      "errorLogPath" : "/home/gh/Downloads",
+      "MinimumDiskSize": "10", minimum disk size in Gig
+      "LastBackupDate": "1", days
+      "Serial1":"0000000000",
+      "Serial2":"0000000000",
+      "SitePath" : "/home/gh/Downloads/sitescan.htm",
+      "offline_sitePath" : "/home/gh/Downloads/",
+      "offline_history" : "10", days, deletes the history older than n days
+      "saveToFile":"1",{0=save to Database,1=save to file}
+      "readFromFile":"0",{0=read from Database,1= actual read from system}
+      "mysql_odbcdrivername":"MySQL ODBC 8.0 Driver",{Linux="MySQL ODBC 8.0 Driver",Windows="MySQL ODBC 8.0 ANSI Driver"}
+      "mssql_odbcdrivername":"ODBC Driver 17 for SQL Server" {Linux="ODBC Driver 17 for SQL Server",Windows="ODBC Driver 17 for SQL Server"}
+    }
+
+}
+#table
+sitescan table
+id	int	auto increment
+sitecontent	varchar(4000)
+regDateTime	datetime2(7)
