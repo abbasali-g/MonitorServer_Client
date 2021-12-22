@@ -2,19 +2,22 @@
 import sys
 import json
 import os
-#import pyodbc
-import pymssql
-import pymysql
-import urllib3
-import DateConvertor as dt
-import datetime
-import time
-import glob
-import psutil
-import dmidecode
 import base64
 import subprocess
 import platform
+import datetime
+import time
+import glob
+import decimal
+#import Thirdparty packages
+import pymssql
+import pymysql
+import lib.python3_8.site_packages.urllib3
+import lib.python3_8.site_packages.DateConvertor as dt
+import lib.python3_8.site_packages.psutil
+import lib.python3_8.site_packages.dmidecode
+
+
 
 # global variable
 logPath = None
