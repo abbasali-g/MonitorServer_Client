@@ -23,9 +23,8 @@ import requests
 # global variable
 logPath             = None
 errorLogPath        = None
-databasedriver      = None
+
 #workingDirectory = "/d/DtecMonitor/Monitoring_ClientSide_Git/Monitoring_ClientSide/"
-workingDirectory = "C:\\Monitoring\\Monitoring_ClientSide\\"
 saveToFile          = None
 project_isonline    = None
 offline_history     = None
@@ -33,7 +32,11 @@ offline_sitePath    = None
 sitepath            = None
 sqltype             = None
 token               = None
-
+sql_server          = None
+sql_username        = None
+sql_password        = None
+sql_database_name   = None
+sql_port            = None
 
 # end of global variable
 
@@ -86,6 +89,11 @@ def de_asymetricAbbas2(txt):
 def saveData(siteContent):
     global offline_sitePath
     global sitepath
+    global sql_server
+    global sql_username
+    global sql_password
+    global sql_database_name
+    global sql_port
 
     # if project has access to internet
     if (project_isonline == "1"):
@@ -96,9 +104,9 @@ def saveData(siteContent):
                 f.close()
             if (saveToFile == "0"):  # write to database
                 if (sqltype == "Mssql"):
-                    conn = pymssql.connect(databasedriver)
+                    conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
                 if (sqltype == "Mysql"):
-                    conn = pymysql.connect(databasedriver)
+                    conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
                 cursor = conn.cursor(as_dict=True)
                 # delete the Old History
                 cursor.execute("delete from sitescan ")
@@ -131,9 +139,9 @@ def saveData(siteContent):
 
             if (saveToFile == "0"):  # write to database
                 if (sqltype == "Mssql"):
-                    conn = pymssql.connect(databasedriver)
+                    conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
                 if (sqltype == "Mysql"):
-                    conn = pymysql.connect(databasedriver)
+                    conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
 
                 cursor = conn.cursor()
                 cursor.execute(
@@ -152,8 +160,6 @@ def saveData(siteContent):
 def monitorSite(project_dict):
     # define vaiables
     global logPath
-    global errorLogPath
-    global databasedriver
     global saveToFile
     global project_isonline
     global errorLogPath
@@ -162,6 +168,11 @@ def monitorSite(project_dict):
     global sitepath
     global sqltype
     global token
+    global sql_server
+    global sql_username
+    global sql_password
+    global sql_database_name
+    global sql_port
     
     
     siteContent = ""
@@ -194,17 +205,7 @@ def monitorSite(project_dict):
     readFromFile = project_dict['readFromFile']
     
 
-    # databasedriver = "DRIVER={" + mssql_odbcdrivername + "};SERVER=" + de_asymetricAbbas2(
-    #     sql_server) + ";DATABASE=" + de_asymetricAbbas2(sql_database_name) + ";UID=" + de_asymetricAbbas2(
-    #     sql_username) + ";PWD=" + de_asymetricAbbas2(sql_password)
-    databasedriver = "host="+de_asymetricAbbas2(sql_server) + ",user="+de_asymetricAbbas2(sql_username) + ",password=" + de_asymetricAbbas2(sql_password)+",database=" + de_asymetricAbbas2(sql_database_name) ;
-    if (sqltype == "Mysql"):
-        # databasedriver = "DRIVER={" + mysql_odbcdrivername + "};SERVER=" + de_asymetricAbbas2(
-        #     sql_server) + ";DATABASE=" + de_asymetricAbbas2(sql_database_name) + ";UID=" + de_asymetricAbbas2(
-        #     sql_username) + ";PWD=" + de_asymetricAbbas2(sql_password)
-        databasedriver = de_asymetricAbbas2(sql_server) + ","+de_asymetricAbbas2(sql_username) + "," + de_asymetricAbbas2(sql_password)+"," + de_asymetricAbbas2(sql_database_name) ;
-
-    
+       
    
 
     # end of vaiables
@@ -219,9 +220,9 @@ def monitorSite(project_dict):
                 query = "select sitecontent from sitescan order by regdatetime desc limit 1"  # for mysql
             
             if (sqltype == "Mssql"):
-                conn = pymssql.connect(databasedriver)
+                conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
             if (sqltype == "Mysql"):
-                conn = pymysql.connect(databasedriver)
+                conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
             cursor = conn.cursor(as_dict=True)
             cursor.execute(query)
             row = cursor.fetchone()
@@ -244,9 +245,9 @@ def monitorSite(project_dict):
         json_response += "'projectname':'" + projectname + "'"
         if (sqltype != "false"):
             if (sqltype == "Mssql"):
-                conn = pymssql.connect(databasedriver)
+                conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
             if (sqltype == "Mysql"):
-                conn = pymysql.connect(databasedriver)
+                conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
             
             
             cursor = conn.cursor(as_dict=True)
@@ -327,21 +328,19 @@ def monitorSite(project_dict):
     try:  # Web Service
         #json_response += ",'WebService':[";
         for wsv in webservice:
-           
+            
             try:
                 my_headers = {'Authorization' : 'Bearer {"'+token+'}'}
                 response = requests.get(wsv, headers=my_headers)
                 response_json = response.json()
 
-                print(response_json['userId'])
-                print(response_json['title'])
+              
 
                 json_response += ",'webservice':'"+response_json['rz']+"'"
                 json_response += ",'webserviceDetail':'"+response_json['msg']+"'"
                               
                 #json_response += "},";
             except Exception as wsvexInt:
-                print(str(wsvexInt))
                 json_response += ",'webservice':0"
                 errmsg += "webservice=" + str(wsvexInt)
         
@@ -441,9 +440,9 @@ def doPing(hostname):
 
 
 # monitorSite()
-print("Python Running")
 
-
+#connn = pymssql.connect(server='.', user='sa', password='123', database='Emdad_Mosharekat',port=1433)
+ 
 
 if (len(sys.argv) > 1):
     if (str(sys.argv[1]) == "enc"):
@@ -456,7 +455,12 @@ if (len(sys.argv) > 1):
         doPing(sys.argv[2])
 else:
     try:
-        
+        workingDirectory = os.path.dirname(os.path.abspath(__file__)) +"\\"
+        if(platform.system()=="Windows"):
+            workingDirectory = os.path.dirname(os.path.abspath(__file__)) +"\\"
+        else:
+            workingDirectory = os.path.dirname(os.path.abspath(__file__)) +"/"
+
         json_file = open(workingDirectory+'project.config')
         data = json.load(json_file)
         sitepath = data['SitePath']

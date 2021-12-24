@@ -14,9 +14,9 @@
           "SQL_database_name" : "RW91kYWRfTW9zyaGFyZWthdFA==",
           "SQL_port" : "1433",
           "SqlType" : "Mssql", --{Mssql,Mysql,false}
-          "OsType" : "Linux",
+          "OsType" : "Linux", --{Linux,Windows}
           "DiskPath" : "['/;50','/;50']", -- disk name like c: or /(root) and the min size to be checked
-          "DbBackupPath" : "/home/abbas/Downloads/*.bak",
+          "DbBackupPath" : "/home/abbas/Downloads/*.bak", -- {false, path}
           "WebService":"['https://jsonplaceholder.typicode.com/todos/1']",
           "logPath" : "C:\\Users\\Jabbari\\Downloads\\",
           "errorLogPath" : "C:\\Users\\Jabbari\\Downloads\\", 
