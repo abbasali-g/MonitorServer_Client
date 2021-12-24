@@ -9,27 +9,30 @@ import datetime
 import time
 import glob
 import decimal
+
 #import Thirdparty packages
 import pymssql
 import pymysql
-import lib.python3_8.site_packages.urllib3
+import urllib3
 import lib.python3_8.site_packages.DateConvertor as dt
-import lib.python3_8.site_packages.psutil
-import lib.python3_8.site_packages.dmidecode
-
+import psutil
+import dmidecode
+import requests
 
 
 # global variable
-logPath = None
-errorLogPath = None
-databasedriver = None
-workingDirectory = "/d/DtecMonitor/Monitoring_ClientSide_Git/Monitoring_ClientSide/"
-saveToFile = None
-project_isonline = None
-offline_history = None
-offline_sitePath = None
-sitepath = None
-sqltype = None
+logPath             = None
+errorLogPath        = None
+databasedriver      = None
+#workingDirectory = "/d/DtecMonitor/Monitoring_ClientSide_Git/Monitoring_ClientSide/"
+workingDirectory = "C:\\Monitoring\\Monitoring_ClientSide\\"
+saveToFile          = None
+project_isonline    = None
+offline_history     = None
+offline_sitePath    = None
+sitepath            = None
+sqltype             = None
+token               = None
 
 
 # end of global variable
@@ -82,6 +85,7 @@ def de_asymetricAbbas2(txt):
 
 def saveData(siteContent):
     global offline_sitePath
+    global sitepath
 
     # if project has access to internet
     if (project_isonline == "1"):
@@ -157,6 +161,10 @@ def monitorSite(project_dict):
     global offline_sitePath
     global sitepath
     global sqltype
+    global token
+    
+    
+    siteContent = ""
 
     # json_file = open('project.config')
     # data = json.load(json_file)
@@ -170,12 +178,13 @@ def monitorSite(project_dict):
     sqltype = project_dict['SqlType']  # Mssql or Mssql
     ostype = project_dict['OsType']  # Windows or Linux
     diskpath = eval(project_dict['DiskPath'])  # array of drives or path
+    webservice = eval(project_dict['WebService'])  # array of webservice
     dbbackuppath = project_dict['DbBackupPath']
     minimumdisksize = project_dict['MinimumDiskSize']
     lastbackupdate = project_dict['LastBackupDate']  # day
     serial1 = project_dict['Serial1']
     serial2 = project_dict['Serial2']
-    sitepath = project_dict['SitePath']
+    
     project_isonline = project_dict['project_isonline']
     offline_history = project_dict['offline_history']
     offline_sitePath = project_dict['offline_sitePath']
@@ -203,7 +212,7 @@ def monitorSite(project_dict):
     # siteResponse = siteResponse.Replace("'</body></html>", "").Replace("<html><body>b'", "");
     if (readFromFile == "0"):  # read ready data from database
         try:
-            sitecontent = ""
+            
             query = "select top 1 sitecontent from sitescan order by regdatetime desc"  # for sqlserver
             
             if (sqltype == "Mysql"):
@@ -221,12 +230,12 @@ def monitorSite(project_dict):
 
             if (sitecontent != ""):
                 sitecontent = "b'" + sitecontent + "'"
-                saveData(sitecontent)
+                #saveData(sitecontent)
 
         except Exception as sexx:
             writeErrorToFile(sexx)
 
-        return
+        return sitecontent
 
     # Actual Read Data
     errmsg = ""
@@ -278,11 +287,11 @@ def monitorSite(project_dict):
         errmsg += "Mem=" + str(memoryex)
 
     try:  # disk
-
+        #json_response += ",'Disk':[";
         for disk in diskpath:
 
             try:
-
+                #json_response += "{";
                 drive_size = disk.split(";")
                 partition = disk
                 partitionsize = minimumdisksize
@@ -304,13 +313,45 @@ def monitorSite(project_dict):
                 json_response += ",'disk_total_" + partition + "=':" + str(disk_total) + ""
                 json_response += ",'disk_free_" + partition + "=':" + str(disk_free) + ""
                 json_response += ",'disk_used_" + partition + "=':" + str(disk_used) + ""
+                #json_response += "},";
             except Exception as diskIex:
                 json_response += ",'disk':0"
                 errmsg += "Disk=" + str(diskIex)
+        
+        #json_response += "]";
+        
     except Exception as diskex:
         json_response += ",'disk':0"
         errmsg += "Disk=" + str(diskex)
 
+    try:  # Web Service
+        #json_response += ",'WebService':[";
+        for wsv in webservice:
+           
+            try:
+                my_headers = {'Authorization' : 'Bearer {"'+token+'}'}
+                response = requests.get(wsv, headers=my_headers)
+                response_json = response.json()
+
+                print(response_json['userId'])
+                print(response_json['title'])
+
+                json_response += ",'webservice':'"+response_json['rz']+"'"
+                json_response += ",'webserviceDetail':'"+response_json['msg']+"'"
+                              
+                #json_response += "},";
+            except Exception as wsvexInt:
+                print(str(wsvexInt))
+                json_response += ",'webservice':0"
+                errmsg += "webservice=" + str(wsvexInt)
+        
+        #json_response += "]";
+        
+    except Exception as wsvex:
+        json_response += ",'webservice':0"
+        errmsg += "webservice=" + str(wsvex)
+
+    
     try:  # connected users
         users = psutil.users()
         json_response += ",'users':'" + str(users).replace("'", "").replace(":", "-").replace("[", "").replace("]",
@@ -386,7 +427,8 @@ def monitorSite(project_dict):
     # print(json_response)
     siteContent = asymetricAbbas(json_response)
 
-    saveData(siteContent)
+    #saveData(siteContent)
+    return siteContent
 
 
 def doPing(hostname):
@@ -401,6 +443,8 @@ def doPing(hostname):
 # monitorSite()
 print("Python Running")
 
+
+
 if (len(sys.argv) > 1):
     if (str(sys.argv[1]) == "enc"):
         print(sys.argv[2])
@@ -412,12 +456,22 @@ if (len(sys.argv) > 1):
         doPing(sys.argv[2])
 else:
     try:
-        print(os.getcwd())
+        
         json_file = open(workingDirectory+'project.config')
         data = json.load(json_file)
-
+        sitepath = data['SitePath']
+        token = data['WsvToken']
+        
+        
+        #sitelist=[]
+        sitelist = ""
         for project in data['project_Config']:
-            monitorSite(project)
+            rz = monitorSite(project)
+            #sitelist.append(rz+"###")
+            sitelist = sitelist + rz +"###"
+        
+        saveData(sitelist)
+
             
     except Exception as jsonex:
         #print("::: "+str(jsonex))
@@ -425,3 +479,4 @@ else:
 
 
 
+  

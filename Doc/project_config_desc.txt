@@ -1,9 +1,38 @@
 {
+  "SitePath" : "C:\\Users\\Jabbari\\Downloads\\sitescan.htm", -- file path to save the content of read
+  "WsvToken":"", -- web service token
+  "WsvUser":"", -- web service username
+  "WsvPass":"",-- web service password
   "project_Config":
     [
         {
           "projectname": "Dade Tamin",
-          "project_isonline": "0",
+          "project_isonline": "1", -- {1,0} if not online,will save data to local
+          "SQL_server" : "MTkyLIjE82OC64yLIjI=",
+          "SQL_username" : "zc82E=",
+          "SQL_password" : "MTIz",
+          "SQL_database_name" : "RW91kYWRfTW9zyaGFyZWthdFA==",
+          "SQL_port" : "1433",
+          "SqlType" : "Mssql", --{Mssql,Mysql,false}
+          "OsType" : "Linux",
+          "DiskPath" : "['/;50','/;50']", -- disk name like c: or /(root) and the min size to be checked
+          "DbBackupPath" : "/home/abbas/Downloads/*.bak",
+          "WebService":"['https://jsonplaceholder.typicode.com/todos/1']",
+          "logPath" : "C:\\Users\\Jabbari\\Downloads\\",
+          "errorLogPath" : "C:\\Users\\Jabbari\\Downloads\\", 
+          "MinimumDiskSize": "10",
+          "LastBackupDate": "1",
+          "Serial1":"0000000000",
+          "Serial2":"0000000000",
+          "offline_sitePath" : "C:\\Users\\Jabbari\\Downloads\\", -- offline site path 
+          "offline_history" : "10", -- offline history to keep
+          "saveToFile":"1", -- {0,1} if 1 then save to sitescan file else writes to database
+          "readFromFile":"1" -- {0,1} if 1 reads the hardware or software locally else get pre-read data from database
+          
+        }
+        ,{
+          "projectname": "Dade Tamin",
+          "project_isonline": "1",
           "SQL_server" : "MTkyLIjE82OC64yLIjI=",
           "SQL_username" : "zc82E=",
           "SQL_password" : "MTIz",
@@ -12,52 +41,20 @@
           "SqlType" : "Mssql",
           "OsType" : "Linux",
           "DiskPath" : "['/;50','/;50']",
-          "DbBackupPath" : "/home/gh/Downloads/DatataminSite/pub/wwwroot/Files/*.bak",
-          "logPath" : "/home/gh/Downloads/",
-          "errorLogPath" : "/home/gh/Downloads",
+          "DbBackupPath" : "/home/abbas/Downloads/*.bak",
+          "WebService":"['https://jsonplaceholder.typicode.com/todos/1']",
+          "logPath" : "C:\\Users\\Jabbari\\Downloads\\",
+          "errorLogPath" : "C:\\Users\\Jabbari\\Downloads",
           "MinimumDiskSize": "10",
           "LastBackupDate": "1",
           "Serial1":"0000000000",
           "Serial2":"0000000000",
-          "SitePath" : "/home/gh/Downloads/sitescan.htm",
-          "offline_sitePath" : "/home/gh/Downloads/",
+          "offline_sitePath" : "C:\\Users\\Jabbari\\Downloads\\",
           "offline_history" : "10",
           "saveToFile":"1",
-          "readFromFile":"1",
-          "mysql_odbcdrivername":"MySQL ODBC 8.0 Driver",
-          "mssql_odbcdrivername":"ODBC Driver 17 for SQL Server"
-        },
-        {
-          "projectname": "Emdad DB",
-          "project_isonline": "1",
-          "SQL_server" : "JzE5Mi64xNjguMTFAyLIjQ91Jw==",
-          "SQL_username" : "J73NhJw==",
-          "SQL_password" : "J91yBhzc73NwYXNzISNFAJCzc=",
-          "SQL_database_name" : "J0VtZGFkX091vzc82hhzcmVrYXQn",
-          "SQL_port" : "1433",
-          "SqlType" : "false",
-          "OsType" : "Windows",
-          "DiskPath" : "['c:']",
-          "DbBackupPath" : "false",
-          "logPath" : "c:\\Monitor\\MonitorDb\\",
-          "errorLogPath" : "c:\\Monitor\\MonitorDb\\",
-          "MinimumDiskSize": "10",
-          "LastBackupDate": "1",
-          "Serial1":"0000000000",
-          "Serial2":"0000000000",
-          "SitePath" : "C:\\EmdadPublish\\wwwroot\\sitescandb.htm",
-          "offline_sitePath" : "C:\\EmdadPublish\\wwwroot\\",
-          "offline_history" : "10",
-          "saveToFile":"1",
-          "readFromFile":"0"
+          "readFromFile":"1"
           
         }
     ]
 
 }
-
-#table
-sitescan table
-id	int	auto increment
-sitecontent	varchar(4000)
-regDateTime	datetime2(7)

@@ -13,8 +13,9 @@ pip3 install setuptools >> %LOGFILE%
 echo result: %ERRORLEVEL%
 
 
-echo installing pyodbc
-pip3 install pyodbc >> %LOGFILE%
+echo installing sql drivers
+pip3 install pymssql
+pip3 install pymysql
 echo result: %ERRORLEVEL%
 
 echo installing urllib3
@@ -34,6 +35,6 @@ echo installing wmi
 pip3 install wmi  >> %LOGFILE%
 echo result: %ERRORLEVEL% >> %LOGFILE%
 
-echo installing mssql driver
-msodbcsql.msi  >> %LOGFILE%
+echo installing requests
+pip3 install requests
 echo result: %ERRORLEVEL% >> %LOGFILE%
