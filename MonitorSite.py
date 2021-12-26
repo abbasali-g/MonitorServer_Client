@@ -340,6 +340,7 @@ def monitorSite(project_dict):
 
     try:  # Web Service
         #json_response += ",'WebService':[";
+        
         for wsv in webservice:
             
             try:
@@ -356,9 +357,12 @@ def monitorSite(project_dict):
                               
                 #json_response += "},";
             except Exception as wsvexInt:
-                json_response += ",'webservice':0"
+               
+                json_response += ",'webservice':'0'"
                 errmsg += "webservice=" + str(wsvexInt)
         
+        if (len(webservice)==0):
+            json_response += ",'webservice':'2'"
         #json_response += "]";
         
     except Exception as wsvex:
