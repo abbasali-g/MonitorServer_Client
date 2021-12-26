@@ -17,6 +17,7 @@ import lib.python3_8.site_packages.DateConvertor as dt
 import psutil
 import dmidecode
 import requests
+import urllib3
 
 
 # global variable
@@ -208,14 +209,15 @@ def monitorSite(project_dict):
 
     if(readFromFile == "2"): #read from html file of remote server
         try:
-            
+            urllib3.disable_warnings()
             session = requests.Session()
             response = session.get(offline_sitePath,verify=False,)
-            sitecontent = response.text.replace("<html><body>","").replace("</body></html>","").replace("b","",1)
+            sitecontent = response.text.replace("<html><body>","").replace("</body></html>","")
+            if not sitecontent.startswith('b'):
+                return emptyResult(projectname)    
         except Exception as sexxx:
-            writeErrorToFile(sexxx)
-            sitecontent = ""
-            return ""
+            writeErrorToFile("readFromFile:"+sexxx)
+            return emptyResult(projectname)
 
         
         return sitecontent
@@ -366,8 +368,7 @@ def monitorSite(project_dict):
     
     try:  # connected users
         users = psutil.users()
-        json_response += ",'users':'" + str(users).replace("'", "").replace(":", "-").replace("[", "").replace("]",
-                                                                                                               "") + "'"
+        json_response += ",'users':'" + str(users).replace("'", "").replace(":", "-").replace("[", "").replace("]","") + "'"
     except Exception as userex:
         errmsg += "User=" + str(userex)
 
@@ -451,6 +452,19 @@ def doPing(hostname):
     command = ['ping', param, '1', hostname]
     subprocess.call(command)
 
+def emptyResult(projectname):
+    json_response = "{"
+    json_response += "'projectname':'" + projectname + "'"
+    json_response += ",'dbcon':1"
+    json_response += ",'cpu_percent':'0'"
+    json_response += ",'mem_percent':'0'"
+    json_response += ",'disk':'0'"
+    json_response += ",'webservice':'0'"
+    json_response += ",'users':'Server Not Rechable'"
+    json_response += ",'backup':'0'"
+    json_response = json_response.replace("'", "\"")
+    siteContent = asymetricAbbas(json_response)
+    return siteContent
 
 # monitorSite()
 
