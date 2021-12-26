@@ -27,7 +27,7 @@
           "offline_sitePath" : "C:\\Users\\Jabbari\\Downloads\\", -- offline site path 
           "offline_history" : "10", -- offline history to keep
           "saveToFile":"1", -- {0,1} if 1 then save to sitescan file else writes to database
-          "readFromFile":"1" -- {0,1} if 1 reads the hardware or software locally else get pre-read data from database
+          "readFromFile":"1" -- {0,1,2} if 1 reads the hardware or software locally , if  0  get pre-read data from database, if 2 get offline_sitePath to read data
           
         }
         ,{

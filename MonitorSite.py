@@ -13,7 +13,6 @@ import decimal
 #import Thirdparty packages
 import pymssql
 import pymysql
-import urllib3
 import lib.python3_8.site_packages.DateConvertor as dt
 import psutil
 import dmidecode
@@ -205,10 +204,18 @@ def monitorSite(project_dict):
     readFromFile = project_dict['readFromFile']
     
 
-       
-   
-
     # end of vaiables
+
+    if(readFromFile == "2"): #read from html file of remote server
+        try:
+            session = requests.Session()
+            response = session.get(offline_sitePath,verify=False)
+        except Exception as sexxx:
+            writeErrorToFile(sexxx)
+            return ""
+
+        return str(response.content).replace("<html><body>","").replace("</body></html>","").replace("b","",1)
+
 
     # siteResponse = siteResponse.Replace("'</body></html>", "").Replace("<html><body>b'", "");
     if (readFromFile == "0"):  # read ready data from database
@@ -442,7 +449,6 @@ def doPing(hostname):
 # monitorSite()
 
 #connn = pymssql.connect(server='.', user='sa', password='123', database='Emdad_Mosharekat',port=1433)
- 
 
 if (len(sys.argv) > 1):
     if (str(sys.argv[1]) == "enc"):
