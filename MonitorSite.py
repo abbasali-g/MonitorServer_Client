@@ -208,13 +208,17 @@ def monitorSite(project_dict):
 
     if(readFromFile == "2"): #read from html file of remote server
         try:
+            
             session = requests.Session()
-            response = session.get(offline_sitePath,verify=False)
+            response = session.get(offline_sitePath,verify=False,)
+            sitecontent = response.text.replace("<html><body>","").replace("</body></html>","").replace("b","",1)
         except Exception as sexxx:
             writeErrorToFile(sexxx)
+            sitecontent = ""
             return ""
 
-        return str(response.content).replace("<html><body>","").replace("</body></html>","").replace("b","",1)
+        
+        return sitecontent
 
 
     # siteResponse = siteResponse.Replace("'</body></html>", "").Replace("<html><body>b'", "");
@@ -340,11 +344,13 @@ def monitorSite(project_dict):
                 my_headers = {'Authorization' : 'Bearer {"'+token+'}'}
                 response = requests.get(wsv, headers=my_headers)
                 response_json = response.json()
+                
 
               
-
+                json_response += ",'webserviceStatusCode':'"+str(response.status_code)+"'"
                 json_response += ",'webservice':'"+response_json['rz']+"'"
                 json_response += ",'webserviceDetail':'"+response_json['msg']+"'"
+                
                               
                 #json_response += "},";
             except Exception as wsvexInt:
@@ -477,9 +483,9 @@ else:
         sitelist = ""
         for project in data['project_Config']:
             rz = monitorSite(project)
-            #sitelist.append(rz+"###")
             sitelist = sitelist + rz +"###"
         
+        #sitelist = sitelist + "]";
         saveData(sitelist)
 
             
