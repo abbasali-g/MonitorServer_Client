@@ -85,8 +85,30 @@ def de_asymetricAbbas2(txt):
     newText = newText.replace("'", "").replace('"', '')
     return newText
 
+def doPing(hostname):
+    # ping = os.system("ping -c 1 " + hostname)
+    param = '-n' if platform.system().lower() == 'windows' else '-c'
 
-def saveData(siteContent):
+    # Building the command. Ex: "ping -c 1 google.com"
+    command = ['ping', param, '1', hostname]
+    subprocess.call(command)
+
+def emptyResult(projectname):
+    json_response = "{"
+    json_response += "'projectname':'" + projectname + "'"
+    json_response += ",'dbcon':1"
+    json_response += ",'cpu_percent':'0'"
+    json_response += ",'mem_percent':'0'"
+    json_response += ",'disk':'0'"
+    json_response += ",'webservice':'0'"
+    json_response += ",'users':'Server Not Rechable'"
+    json_response += ",'backup':'0'"
+    json_response = json_response.replace("'", "\"")
+    siteContent = asymetricAbbas(json_response)
+    return siteContent
+
+
+def saveData(sitelist): 
     global offline_sitePath
     global sitepath
     global sql_server
@@ -100,7 +122,7 @@ def saveData(siteContent):
         try:
             if (saveToFile == "1"):
                 f = open(sitepath, "w")
-                f.write("<html><body>" + siteContent + "</body></html>")
+                f.write("<html><body>" + sitelist + "</body></html>")
                 f.close()
             if (saveToFile == "0"):  # write to database
                 if (sqltype == "Mssql"):
@@ -111,7 +133,7 @@ def saveData(siteContent):
                 # delete the Old History
                 cursor.execute("delete from sitescan ")
                 cursor.execute(
-                    "insert into sitescan(sitecontent,regDateTime) values('" + siteContent.replace("b'", "").replace(
+                    "insert into sitescan(sitelist,regDateTime) values('" + sitelist.replace("b'", "").replace(
                         "'", "") + "','" + str(datetime.datetime.now()) + "');")
 
                 conn.commit()
@@ -145,7 +167,7 @@ def saveData(siteContent):
 
                 cursor = conn.cursor()
                 cursor.execute(
-                    "insert into sitescan(sitecontent,regDateTime) values('" + siteContent.replace("b'", "").replace(
+                    "insert into sitescan(siteContent,regDateTime) values('" + siteContent.replace("b'", "").replace(
                         "'", "") + "','" + str(datetime.datetime.now()) + "');")
                 # delete the Old History
                 cursor.execute("delete from sitescan where regDateTime<='" + str(
@@ -155,7 +177,6 @@ def saveData(siteContent):
                 conn.close()
         except Exception as fileex:
             writeErrorToFile(fileex)
-
 
 def monitorSite(project_dict):
     # define vaiables
@@ -212,25 +233,25 @@ def monitorSite(project_dict):
             urllib3.disable_warnings()
             session = requests.Session()
             response = session.get(offline_sitePath,verify=False,)
-            sitecontent = response.text.replace("<html><body>","").replace("</body></html>","")
-            if not sitecontent.startswith('b'):
+            siteContent = response.text.replace("<html><body>","").replace("</body></html>","")
+            if not siteContent.startswith('b'):
                 return emptyResult(projectname)    
         except Exception as sexxx:
             writeErrorToFile("readFromFile:"+sexxx)
             return emptyResult(projectname)
 
         
-        return sitecontent
+        return siteContent
 
 
     # siteResponse = siteResponse.Replace("'</body></html>", "").Replace("<html><body>b'", "");
     if (readFromFile == "0"):  # read ready data from database
         try:
             
-            query = "select top 1 sitecontent from sitescan order by regdatetime desc"  # for sqlserver
+            query = "select top 1 siteContent from sitescan order by regdatetime desc"  # for sqlserver
             
             if (sqltype == "Mysql"):
-                query = "select sitecontent from sitescan order by regdatetime desc limit 1"  # for mysql
+                query = "select siteContent from sitescan order by regdatetime desc limit 1"  # for mysql
             
             if (sqltype == "Mssql"):
                 conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
@@ -239,17 +260,17 @@ def monitorSite(project_dict):
             cursor = conn.cursor(as_dict=True)
             cursor.execute(query)
             row = cursor.fetchone()
-            sitecontent = str(row[0])
+            siteContent = str(row[0])
             conn.close()
 
-            if (sitecontent != ""):
-                sitecontent = "b'" + sitecontent + "'"
-                #saveData(sitecontent)
+            if (siteContent != ""):
+                siteContent = "b'" + siteContent + "'"
+                #saveData(siteContent)
 
         except Exception as sexx:
             writeErrorToFile(sexx)
 
-        return sitecontent
+        return siteContent
 
     # Actual Read Data
     errmsg = ""
@@ -448,27 +469,6 @@ def monitorSite(project_dict):
     return siteContent
 
 
-def doPing(hostname):
-    # ping = os.system("ping -c 1 " + hostname)
-    param = '-n' if platform.system().lower() == 'windows' else '-c'
-
-    # Building the command. Ex: "ping -c 1 google.com"
-    command = ['ping', param, '1', hostname]
-    subprocess.call(command)
-
-def emptyResult(projectname):
-    json_response = "{"
-    json_response += "'projectname':'" + projectname + "'"
-    json_response += ",'dbcon':1"
-    json_response += ",'cpu_percent':'0'"
-    json_response += ",'mem_percent':'0'"
-    json_response += ",'disk':'0'"
-    json_response += ",'webservice':'0'"
-    json_response += ",'users':'Server Not Rechable'"
-    json_response += ",'backup':'0'"
-    json_response = json_response.replace("'", "\"")
-    siteContent = asymetricAbbas(json_response)
-    return siteContent
 
 # monitorSite()
 
