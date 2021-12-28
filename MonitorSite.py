@@ -60,6 +60,7 @@ def writeLogToFile(msg):
 
 def asymetricAbbas(txt):
     # Ab sa li
+    newText = txt
     newText = base64.b64encode(str(txt).encode("utf-8"))
     newText = str(newText).replace("A", "Ab").replace("s", "sa").replace("l", "li")
     return newText
@@ -68,9 +69,7 @@ def asymetricAbbas2(txt):
     # Ab sa li
     newText = txt
     newText = base64.b64encode(str(newText).encode("utf-8"))
-    newText = str(newText).replace("c", "zc").replace("a", "ya").replace("B", "yB").replace("A", "FA").replace("s",
-                                                                                                               "XU").replace(
-        "L", "LI").replace("1", "91").replace("2", "82").replace("3", "73").replace("4", "64")
+    newText = str(newText).replace("c", "zc").replace("a", "ya").replace("B", "yB").replace("A", "FA").replace("s","XU").replace("L", "LI").replace("1", "91").replace("2", "82").replace("3", "73").replace("4", "64")
     return newText
 
 def de_asymetricAbbas2(txt):
@@ -96,13 +95,14 @@ def doPing(hostname):
 def emptyResult(projectname):
     json_response = "{"
     json_response += "'projectname':'" + projectname + "'"
-    json_response += ",'dbcon':1"
+    json_response += ",'dbcon':2"
     json_response += ",'cpu_percent':'0'"
     json_response += ",'mem_percent':'0'"
     json_response += ",'disk':'0'"
-    json_response += ",'webservice':'0'"
+    json_response += ",'webservice':'2'"
     json_response += ",'users':'Server Not Rechable'"
-    json_response += ",'backup':'0'"
+    json_response += ",'backup':'2'"
+    json_response += "}"
     json_response = json_response.replace("'", "\"")
     siteContent = asymetricAbbas(json_response)
     return siteContent
@@ -139,7 +139,7 @@ def saveData(sitelist):
                 conn.commit()
                 conn.close()
         except Exception as fileex:
-            writeErrorToFile(fileex)
+            writeErrorToFile("save data isonline:"+fileex)
 
     # if project type os offline, then save file per scan
     if (project_isonline == "0"):
@@ -148,7 +148,7 @@ def saveData(sitelist):
                 offline_sitePath = offline_sitePath + "sitescan_" + str(datetime.datetime.now().date()) + "_" + str(
                     datetime.datetime.now().time())[0:5].replace(":", "-") + ".dtec"
                 f = open(offline_sitePath, "w")
-                f.write("<html><body>" + siteContent + "</body></html>")
+                f.write("<html><body>" + sitelist + "</body></html>")
                 f.close()
                 fileList = glob.glob(offline_sitePath + "*.dtec")
                 now = time.time()
@@ -157,7 +157,7 @@ def saveData(sitelist):
                         if os.stat(filePath).st_mtime < now - (int(offline_history) * 86400):
                             os.remove(filePath)
                     except Exception as ex:
-                        writeErrorToFile(ex)
+                        writeErrorToFile("save data project online =1"+ex)
 
             if (saveToFile == "0"):  # write to database
                 if (sqltype == "Mssql"):
@@ -167,7 +167,7 @@ def saveData(sitelist):
 
                 cursor = conn.cursor()
                 cursor.execute(
-                    "insert into sitescan(siteContent,regDateTime) values('" + siteContent.replace("b'", "").replace(
+                    "insert into sitescan(siteContent,regDateTime) values('" + sitelist.replace("b'", "").replace(
                         "'", "") + "','" + str(datetime.datetime.now()) + "');")
                 # delete the Old History
                 cursor.execute("delete from sitescan where regDateTime<='" + str(
@@ -176,7 +176,7 @@ def saveData(sitelist):
                 conn.commit
                 conn.close()
         except Exception as fileex:
-            writeErrorToFile(fileex)
+            writeErrorToFile("save end:"+fileex)
 
 def monitorSite(project_dict):
     # define vaiables
@@ -234,8 +234,12 @@ def monitorSite(project_dict):
             session = requests.Session()
             response = session.get(offline_sitePath,verify=False,)
             siteContent = response.text.replace("<html><body>","").replace("</body></html>","")
-            if not siteContent.startswith('b'):
-                return emptyResult(projectname)    
+            # if not siteContent.startswith('b'):
+            #     return emptyResult(projectname)
+             
+            if (siteContent != "" and not siteContent.startswith("b'")):
+                siteContent = "b'" + siteContent + "'"
+           
         except Exception as sexxx:
             writeErrorToFile("readFromFile:"+sexxx)
             return emptyResult(projectname)
@@ -268,7 +272,7 @@ def monitorSite(project_dict):
                 #saveData(siteContent)
 
         except Exception as sexx:
-            writeErrorToFile(sexx)
+            writeErrorToFile("readFromFile == 0"+sexx)
 
         return siteContent
 
@@ -501,8 +505,9 @@ else:
         sitelist = ""
         for project in data['project_Config']:
             rz = monitorSite(project)
-            sitelist = sitelist + rz +"###"
-        
+            if(rz!="" and len(rz)>10):
+                sitelist = sitelist + rz +"###"
+                
         #sitelist = sitelist + "]";
         saveData(sitelist)
 
