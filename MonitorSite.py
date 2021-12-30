@@ -104,7 +104,7 @@ def emptyResult(projectname):
     json_response += ",'backup':'2'"
     json_response += "}"
     json_response = json_response.replace("'", "\"")
-    siteContent = asymetricAbbas(json_response)
+    siteContent = "b'"+asymetricAbbas(json_response)+"'"
     return siteContent
 
 
@@ -129,17 +129,17 @@ def saveData(sitelist):
                     conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
                 if (sqltype == "Mysql"):
                     conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
-                cursor = conn.cursor(as_dict=True)
+                cursor = conn.cursor()
                 # delete the Old History
-                cursor.execute("delete from sitescan ")
+                cursor.execute("delete from sitescan; ")
                 cursor.execute(
-                    "insert into sitescan(sitelist,regDateTime) values('" + sitelist.replace("b'", "").replace(
+                    "insert into sitescan(sitecontent,regDateTime) values('" + sitelist.replace("b'", "").replace("###", "").replace(
                         "'", "") + "','" + str(datetime.datetime.now()) + "');")
 
                 conn.commit()
                 conn.close()
         except Exception as fileex:
-            writeErrorToFile("save data isonline:"+fileex)
+            writeErrorToFile("save data isonline:"+str(fileex))
 
     # if project type os offline, then save file per scan
     if (project_isonline == "0"):
@@ -157,7 +157,7 @@ def saveData(sitelist):
                         if os.stat(filePath).st_mtime < now - (int(offline_history) * 86400):
                             os.remove(filePath)
                     except Exception as ex:
-                        writeErrorToFile("save data project online =1"+ex)
+                        writeErrorToFile("save data project online =1"+str(ex))
 
             if (saveToFile == "0"):  # write to database
                 if (sqltype == "Mssql"):
@@ -167,7 +167,7 @@ def saveData(sitelist):
 
                 cursor = conn.cursor()
                 cursor.execute(
-                    "insert into sitescan(siteContent,regDateTime) values('" + sitelist.replace("b'", "").replace(
+                    "insert into sitescan(sitecontent,regDateTime) values('" + sitelist.replace("b'", "").replace("###", "").replace(
                         "'", "") + "','" + str(datetime.datetime.now()) + "');")
                 # delete the Old History
                 cursor.execute("delete from sitescan where regDateTime<='" + str(
@@ -176,7 +176,7 @@ def saveData(sitelist):
                 conn.commit
                 conn.close()
         except Exception as fileex:
-            writeErrorToFile("save end:"+fileex)
+            writeErrorToFile("save end:"+str(fileex))
 
 def monitorSite(project_dict):
     # define vaiables
@@ -234,14 +234,16 @@ def monitorSite(project_dict):
             session = requests.Session()
             response = session.get(offline_sitePath,verify=False,)
             siteContent = response.text.replace("<html><body>","").replace("</body></html>","")
-            # if not siteContent.startswith('b'):
-            #     return emptyResult(projectname)
-             
-            if (siteContent != "" and not siteContent.startswith("b'")):
+            
+           
+            if (siteContent!="" and len(siteContent)>10 and  not siteContent.startswith("b")):
                 siteContent = "b'" + siteContent + "'"
            
+            if (siteContent=="" and len(siteContent)<10):
+                return emptyResult(projectname)
+           
         except Exception as sexxx:
-            writeErrorToFile("readFromFile:"+sexxx)
+            writeErrorToFile("readFromFile:"+str(sexxx))
             return emptyResult(projectname)
 
         
@@ -259,20 +261,28 @@ def monitorSite(project_dict):
             
             if (sqltype == "Mssql"):
                 conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
+               
             if (sqltype == "Mysql"):
                 conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
-            cursor = conn.cursor(as_dict=True)
+            
+            cursor = conn.cursor()
             cursor.execute(query)
+           
             row = cursor.fetchone()
+           
             siteContent = str(row[0])
+          
             conn.close()
-
-            if (siteContent != ""):
+         
+            
+            if (siteContent!="" and len(siteContent)>10 and  not siteContent.startswith("b")):
                 siteContent = "b'" + siteContent + "'"
-                #saveData(siteContent)
+           
+            if (siteContent=="" and len(siteContent)<10):
+                return emptyResult(projectname)
 
         except Exception as sexx:
-            writeErrorToFile("readFromFile == 0"+sexx)
+            writeErrorToFile("readFromFile == 0"+str(sexx))
 
         return siteContent
 
@@ -288,7 +298,7 @@ def monitorSite(project_dict):
                 conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
             
             
-            cursor = conn.cursor(as_dict=True)
+            cursor = conn.cursor()
             conn.close()
             json_response += ",'dbcon':1"
         else:
@@ -506,7 +516,10 @@ else:
         for project in data['project_Config']:
             rz = monitorSite(project)
             if(rz!="" and len(rz)>10):
-                sitelist = sitelist + rz +"###"
+                if(rz.endswith("###")):
+                    sitelist = sitelist + rz
+                else:
+                    sitelist = sitelist + rz +"###"
                 
         #sitelist = sitelist + "]";
         saveData(sitelist)
