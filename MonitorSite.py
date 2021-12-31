@@ -292,6 +292,9 @@ def monitorSite(project_dict):
     try:  # connect to database
         json_response += "'projectname':'" + projectname + "'"
         if (sqltype != "false"):
+
+           
+
             if (sqltype == "Mssql"):
                 conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
             if (sqltype == "Mysql"):
@@ -308,6 +311,8 @@ def monitorSite(project_dict):
     except Exception as sqlex:
         json_response += ",'dbcon':0"
         errmsg += "DbCon=" + str(sqlex)
+        writeErrorToFile("connect to database:"+str(sqlex))
+       
 
     try:  # cpu percentage
 
@@ -379,20 +384,20 @@ def monitorSite(project_dict):
         for wsv in webservice:
             
             try:
-                my_headers = {'Authorization' : 'Bearer {"'+token+'}'}
+                my_headers = {'Authorization' : 'Bearer '+token+''}
                 response = requests.get(wsv, headers=my_headers)
                 response_json = response.json()
                 
 
               
                 json_response += ",'webserviceStatusCode':'"+str(response.status_code)+"'"
-                json_response += ",'webservice':'"+response_json['rz']+"'"
-                json_response += ",'webserviceDetail':'"+response_json['msg']+"'"
+                json_response += ",'webservice':'"+str(response_json['rz'])+"'"
+                json_response += ",'webserviceDetail':'"+str(response_json['msg'])+"'"
                 
                               
                 #json_response += "},";
             except Exception as wsvexInt:
-               
+                writeErrorToFile(" Web Service_Int:"+str(wsvexInt))
                 json_response += ",'webservice':'0'"
                 errmsg += "webservice=" + str(wsvexInt)
         
@@ -403,6 +408,7 @@ def monitorSite(project_dict):
     except Exception as wsvex:
         json_response += ",'webservice':0"
         errmsg += "webservice=" + str(wsvex)
+        writeErrorToFile(" Web Service:"+str(wsvex))
 
     
     try:  # connected users
