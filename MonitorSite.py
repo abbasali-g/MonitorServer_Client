@@ -395,7 +395,7 @@ def monitorSite(project_dict):
                     json_response += ",'webservice':'0'"
               
                 
-                json_response += ",'webserviceStatusCode_" + ServiceName + "=':"+str(response.status_code)+"'"
+                json_response += ",'webserviceStatusCode_" + ServiceName + "=':'"+str(response.status_code)+"'"
                 json_response += ",'webservice_" + ServiceName + "=':'"+str(response_json['rz'])+"'"
                 json_response += ",'webserviceDetail_" + ServiceName + "=':'"+str(response_json['msg'])+"'"
 
