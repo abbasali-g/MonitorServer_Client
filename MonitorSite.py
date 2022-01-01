@@ -382,23 +382,31 @@ def monitorSite(project_dict):
         #json_response += ",'WebService':[";
         
         for wsv in webservice:
-            
+            ServiceName = wsv[wsv.rfind("/")+1:]
             try:
                 my_headers = {'Authorization' : 'Bearer '+token+''}
                 response = requests.get(wsv, headers=my_headers)
                 response_json = response.json()
                 
 
+                if(int(response_json['rz'])==1):
+                    json_response += ",'webservice':'1'"
+                else:
+                    json_response += ",'webservice':'0'"
               
-                json_response += ",'webserviceStatusCode':'"+str(response.status_code)+"'"
-                json_response += ",'webservice':'"+str(response_json['rz'])+"'"
-                json_response += ",'webserviceDetail':'"+str(response_json['msg'])+"'"
+                
+                json_response += ",'webserviceStatusCode_" + ServiceName + "=':"+str(response.status_code)+"'"
+                json_response += ",'webservice_" + ServiceName + "=':'"+str(response_json['rz'])+"'"
+                json_response += ",'webserviceDetail_" + ServiceName + "=':'"+str(response_json['msg'])+"'"
+
+               
                 
                               
                 #json_response += "},";
             except Exception as wsvexInt:
-                writeErrorToFile(" Web Service_Int:"+str(wsvexInt))
+                writeErrorToFile(" Web Service_Int_" + ServiceName + "=':"+str(wsvexInt))
                 json_response += ",'webservice':'0'"
+                json_response += ",'webserviceDetail_" + ServiceName + "=':'"+str(wsvexInt)+"'"
                 errmsg += "webservice=" + str(wsvexInt)
         
         if (len(webservice)==0):
