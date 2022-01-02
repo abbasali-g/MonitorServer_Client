@@ -17,6 +17,7 @@ import lib.python3_8.site_packages.DateConvertor as dt
 import psutil
 import dmidecode
 import requests
+from requests.auth import HTTPBasicAuth
 import urllib3
 
 
@@ -32,6 +33,8 @@ offline_sitePath    = None
 sitepath            = None
 sqltype             = None
 token               = None
+WsvUser             = None
+WsvPass             = None
 sql_server          = None
 sql_username        = None
 sql_password        = None
@@ -189,6 +192,8 @@ def monitorSite(project_dict):
     global sitepath
     global sqltype
     global token
+    global WsvUser            
+    global WsvPass
     global sql_server
     global sql_username
     global sql_password
@@ -385,7 +390,13 @@ def monitorSite(project_dict):
             ServiceName = wsv[wsv.rfind("/")+1:]
             try:
                 my_headers = {'Authorization' : 'Bearer '+token+''}
-                response = requests.get(wsv, headers=my_headers)
+                if(len(token)>5 and len(WsvUser)<1):
+                    response = requests.get(wsv, headers=my_headers)
+                if(len(WsvUser)>2 and len(token)<1):
+                    response = requests.get(wsv, auth=HTTPBasicAuth(WsvUser, WsvPass))    
+                if(len(WsvUser)>2 and len(token)>5):
+                    response = requests.get(wsv, headers=my_headers,auth=HTTPBasicAuth(WsvUser, WsvPass))
+
                 response_json = response.json()
                 
 
@@ -522,8 +533,10 @@ else:
         json_file = open(workingDirectory+'project.config')
         data = json.load(json_file)
         sitepath = data['SitePath']
-        token = data['WsvToken']
-        
+        token    = data['WsvToken']
+        WsvUser  = data['WsvUser']
+        WsvPass  = data['WsvPass']
+             
         
         #sitelist=[]
         sitelist = ""
