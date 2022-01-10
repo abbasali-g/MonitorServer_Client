@@ -128,11 +128,16 @@ def saveData(sitelist):
                 f.write("<html><body>" + sitelist + "</body></html>")
                 f.close()
             if (saveToFile == "0"):  # write to database
+
                 if (sqltype == "Mssql"):
                     conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
+                    cursor = conn.cursor(as_dict=True)
+               
                 if (sqltype == "Mysql"):
-                    conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
-                cursor = conn.cursor()
+                    conn = pymysql.connect(host=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=int(sql_port),cursorclass=pymysql.cursors.DictCursor)
+                    cursor = conn.cursor()
+
+                
                 # delete the Old History
                 cursor.execute("delete from sitescan; ")
                 cursor.execute(
@@ -163,12 +168,15 @@ def saveData(sitelist):
                         writeErrorToFile("save data project online =1"+str(ex))
 
             if (saveToFile == "0"):  # write to database
+                
                 if (sqltype == "Mssql"):
                     conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
+                    cursor = conn.cursor(as_dict=True)
+               
                 if (sqltype == "Mysql"):
-                    conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
+                    conn = pymysql.connect(host=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=int(sql_port),cursorclass=pymysql.cursors.DictCursor)
+                    cursor = conn.cursor()
 
-                cursor = conn.cursor()
                 cursor.execute(
                     "insert into sitescan(sitecontent,regDateTime) values('" + sitelist.replace("b'", "").replace("###", "").replace(
                         "'", "") + "','" + str(datetime.datetime.now()) + "');")
@@ -266,16 +274,18 @@ def monitorSite(project_dict):
             
             if (sqltype == "Mssql"):
                 conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
+                cursor = conn.cursor(as_dict=True)
                
             if (sqltype == "Mysql"):
-                conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
+                conn = pymysql.connect(host=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=int(sql_port),cursorclass=pymysql.cursors.DictCursor)
+                cursor = conn.cursor()
             
-            cursor = conn.cursor()
+            
             cursor.execute(query)
            
             row = cursor.fetchone()
            
-            siteContent = str(row[0])
+            siteContent = str(row['siteContent'])
           
             conn.close()
          
@@ -302,11 +312,12 @@ def monitorSite(project_dict):
 
             if (sqltype == "Mssql"):
                 conn = pymssql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
+                cursor = conn.cursor(as_dict=True)
+               
             if (sqltype == "Mysql"):
-                conn = pymysql.connect(server=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=sql_port)
-            
-            
-            cursor = conn.cursor()
+                conn = pymysql.connect(host=de_asymetricAbbas2(sql_server) ,user=de_asymetricAbbas2(sql_username) ,password=de_asymetricAbbas2(sql_password),database=de_asymetricAbbas2(sql_database_name) ,port=int(sql_port),cursorclass=pymysql.cursors.DictCursor)
+                cursor = conn.cursor()
+                
             conn.close()
             json_response += ",'dbcon':1"
         else:
