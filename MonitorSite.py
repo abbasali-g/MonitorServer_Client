@@ -358,6 +358,7 @@ def monitorSite(project_dict):
 
     try:  # disk
         #json_response += ",'Disk':[";
+        diskRz =1
         for disk in diskpath:
 
             try:
@@ -374,10 +375,10 @@ def monitorSite(project_dict):
                 disk_free = round(psutil.disk_usage(partition).free / (1024.0 ** 3), 2)
                 disk_used = round(psutil.disk_usage(partition).used / (1024.0 ** 3), 2)
 
-                if (disk_free < int(partitionsize)):
-                    json_response += ",'disk':0"
-                else:
-                    json_response += ",'disk':1"
+                if(diskRz==1):
+                    if (disk_free < int(partitionsize)):
+                        diskRz=0
+                       
 
                 json_response += ",'disk_percent_" + partition + "=':" + str(disk_percent) + ""
                 json_response += ",'disk_total_" + partition + "=':" + str(disk_total) + ""
@@ -385,8 +386,15 @@ def monitorSite(project_dict):
                 json_response += ",'disk_used_" + partition + "=':" + str(disk_used) + ""
                 #json_response += "},";
             except Exception as diskIex:
-                json_response += ",'disk':0"
+                diskRz=0
                 errmsg += "Disk=" + str(diskIex)
+
+        if(diskRz==1):
+            json_response += ",'disk':1"
+        else:
+            json_response += ",'disk':0"
+            
+
         
         #json_response += "]";
         
@@ -396,7 +404,7 @@ def monitorSite(project_dict):
 
     try:  # Web Service
         #json_response += ",'WebService':[";
-        
+        webServiceRz=1
         for wsv in webservice:
             ServiceName = wsv[wsv.rfind("/")+1:]
             try:
@@ -410,11 +418,12 @@ def monitorSite(project_dict):
 
                 response_json = response.json()
                 
+                if(webServiceRz==1):
+                    if(int(response_json['rz'])==1):
+                        webServiceRz=1
+                    else:
+                        webServiceRz=0
 
-                if(int(response_json['rz'])==1):
-                    json_response += ",'webservice':'1'"
-                else:
-                    json_response += ",'webservice':'0'"
               
                 
                 json_response += ",'webserviceStatusCode_" + ServiceName + "=':'"+str(response.status_code)+"'"
@@ -426,13 +435,18 @@ def monitorSite(project_dict):
                               
                 #json_response += "},";
             except Exception as wsvexInt:
+                webServiceRz=0
                 writeErrorToFile(" Web Service_Int_" + ServiceName + "=':"+str(wsvexInt))
-                json_response += ",'webservice':'0'"
                 json_response += ",'webserviceDetail_" + ServiceName + "=':'"+str(wsvexInt)+"'"
                 errmsg += "webservice=" + str(wsvexInt)
         
         if (len(webservice)==0):
             json_response += ",'webservice':'2'"
+        
+        if(webServiceRz==1):
+            json_response += ",'webservice':'1'"
+        else:
+            json_response += ",'webservice':'0'"
         #json_response += "]";
         
     except Exception as wsvex:
@@ -466,7 +480,7 @@ def monitorSite(project_dict):
         json_response += ",'backup':0"
         errmsg += "backup=" + str(backupex)
 
-    try:
+    try: # DMIDecode 
         if (ostype == "Linux"):
             dmi = dmidecode.DMIDecode()
             json_response += ",'Manufacturer':'" + str(dmi.manufacturer()) + "'"
