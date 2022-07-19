@@ -210,7 +210,7 @@ def monitorSite(project_dict):
     
     
     siteContent = ""
-
+      
     # json_file = open('project.config')
     # data = json.load(json_file)
 
@@ -426,9 +426,9 @@ def monitorSite(project_dict):
 
               
                 
-                json_response += ",'webserviceStatusCode_" + ServiceName + "=':'"+str(response.status_code)+"'"
-                json_response += ",'webservice_" + ServiceName + "=':'"+str(response_json['rz'])+"'"
-                json_response += ",'webserviceDetail_" + ServiceName + "=':'"+str(response_json['msg'])+"'"
+                json_response += ",'webserviceStatusCode_" + ServiceName + "=':'"+str(response.status_code).replace("'","").replace("\"","")+"'"
+                json_response += ",'webservice_" + ServiceName + "=':'"+str(response_json['rz']).replace("'","").replace("\"","")+"'"
+                json_response += ",'webserviceDetail_" + ServiceName + "=':'"+str(response_json['msg']).replace("'","").replace("\"","")+"'"
 
                
                 
@@ -450,7 +450,7 @@ def monitorSite(project_dict):
         #json_response += "]";
         
     except Exception as wsvex:
-        json_response += ",'webservice':0"
+        json_response += ",'webservice':'0'"
         errmsg += "webservice=" + str(wsvex)
         writeErrorToFile(" Web Service:"+str(wsvex))
 
@@ -537,6 +537,7 @@ def monitorSite(project_dict):
 # monitorSite()
 
 #connn = pymssql.connect(server='.', user='sa', password='123', database='Emdad_Mosharekat',port=1433)
+
 
 if (len(sys.argv) > 1):
     if (str(sys.argv[1]) == "enc"):
