@@ -424,11 +424,29 @@ def monitorSite(project_dict):
                     else:
                         webServiceRz=0
 
-              
                 
-                json_response += ",'webserviceStatusCode_" + ServiceName + "=':'"+str(response.status_code).replace("'","").replace("\"","")+"'"
-                json_response += ",'webservice_" + ServiceName + "=':'"+str(response_json['rz']).replace("'","").replace("\"","")+"'"
-                json_response += ",'webserviceDetail_" + ServiceName + "=':'"+str(response_json['msg']).replace("'","").replace("\"","")+"'"
+                wsrv_status="0"
+                wsrv_response = "-1"
+                wsrv_msg="-1"
+       
+                try:
+                    wsrv_status = str(response.status_code).replace("'","").replace("\"","")
+                except Exception as wsvexInt:
+                    wsrv_status="0"
+                try:
+                    wsrv_response = str(response_json['rz']).replace("'","").replace("\"","")
+                except Exception as wsvexInt:
+                    wsrv_response = "-1"
+                try:
+                    wsrv_msg = str(response_json['msg']).replace("'","").replace("\"","").replace("[","").replace("]","")
+                except Exception as wsvexInt:
+                    wsrv_msg="-1"
+
+                
+                
+                json_response += ",'webserviceStatusCode_" + ServiceName + "=':'"+wsrv_status+"'"
+                json_response += ",'webservice_" + ServiceName + "=':'"+wsrv_response+"'"
+                json_response += ",'webserviceDetail_" + ServiceName + "=':'"+wsrv_msg+"'"
 
                
                 
